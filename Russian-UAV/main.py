@@ -1,10 +1,26 @@
 import discord
-from discord.ext import tasks
+import json 
 import urllib.request as ur 
+from discord.ext import tasks
 from bs4 import BeautifulSoup 
 
+
+
 Client = discord.Client()
-Text_Channel = 315240368927145985
+with open("vars.json") as T:
+    vars = json.load(T)["TOKEN"]
+    TOKEN = vars["TOKEN"] # Add your token to vars.json
+    Text_Channel = vars["CHANNEL"] # Add channel ID to vars.json
+    Mention_IDs = vars["IDs"] # Add users IDs as list to vars.json 
+old_message = None
+
+
+def make_mentions(IDs):
+    string = str()
+    for id in IDs: 
+        string += '<@{0}> '.format(id)
+
+    return string
 
 def results ():
     website = "https://www.google.com/search?client=firefox-b-d&q=presidential+election" 
@@ -26,21 +42,28 @@ async def on_ready():
     print("Bot is Ready!")
     myLoop.start()
 
+@Client.event
+async def on_message(message):
+    global old_message
+    if(message.author.id == 773674161226252328):
+        old_message = message
+
 @tasks.loop(seconds=120)
 async def myLoop():
+    global old_message
+    global Mention_IDs 
     b, t = results()
+    if(old_message != None):
+        await old_message.delete()
     if (int(b) >= 270):
-        embed=discord.Embed(title="2020 US election results", description=f"New Russian Enemy Detected: Joe Biden")
+        embed=discord.Embed(title="2020 US election results", description=f"New Russian Enemy Detected: Joe Biden\n{make_mentions(Mention_IDs)}")
         await Client.get_channel(Text_Channel).send(embed=embed)
-        await Client.get_channel(Text_Channel).send("<@325651365789564940> <@258709200312598528> <@515509035638980608>")
-    if (int (t) >= 270): 
-        embed=discord.Embed(title="2020 US election results", description=f"A Russian Enemy Has Renewed His Subscription: Donald Trump")
+    elif (int (t) >= 270): 
+        embed=discord.Embed(title="2020 US election results", description=f"A Russian Enemy Has Renewed His Subscription: Donald Trump\n{make_mentions(Mention_IDs)}")
         await Client.get_channel(Text_Channel).send(embed=embed)
-        await Client.get_channel(Text_Channel).send("<@325651365789564940> <@258709200312598528> <@515509035638980608>")
     else: 
-        embed=discord.Embed(title="2020 US election results", description=f"Joe Biden:{b}\nDonald Trump:{t}")
+        embed=discord.Embed(title="2020 US election results", description=f"Joe Biden:{b}\nDonald Trump:{t}\n{make_mentions(Mention_IDs)}")
         await Client.get_channel(Text_Channel).send(embed=embed)
-        await Client.get_channel(Text_Channel).send("<@325651365789564940> <@258709200312598528> <@515509035638980608>")
 
 
-Client.run('NzczNjc0MTYxMjI2MjUyMzI4.X6MqNg.2TICgEcppF-wbReTFTdGCSeUEoE')
+Client.run(TOKEN)
