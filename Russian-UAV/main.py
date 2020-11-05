@@ -8,7 +8,7 @@ from bs4 import BeautifulSoup
 
 Client = discord.Client()
 with open("vars.json") as T:
-    vars = json.load(T)["TOKEN"]
+    vars = json.load(T)
     TOKEN = vars["TOKEN"] # Add your token to vars.json
     Text_Channel = vars["CHANNEL"] # Add channel ID to vars.json
     Mention_IDs = vars["IDs"] # Add users IDs as list to vars.json 
