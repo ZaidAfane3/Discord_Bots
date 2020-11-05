@@ -54,7 +54,10 @@ async def myLoop():
     global Mention_IDs 
     b, t = results()
     if(old_message != None):
-        await old_message.delete()
+        try: 
+            await old_message.delete()
+        except:
+            pass
     if (int(b) >= 270):
         embed=discord.Embed(title="2020 US election results", description=f"New Russian Enemy Detected: Joe Biden\n{make_mentions(Mention_IDs)}")
         await Client.get_channel(Text_Channel).send(embed=embed)
